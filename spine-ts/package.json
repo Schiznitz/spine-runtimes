@@ -6,7 +6,6 @@
     "README.md"
   ],
   "scripts": {
-    "prepublish": "npm run clean && npm run build",
     "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-webgl/dist spine-phaser/dist spine-player/dist spine-threejs/dist",
     "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:phaser\" \"npm run build:player\" \"npm run build:threejs\"",
     "postbuild": "npm run minify",
