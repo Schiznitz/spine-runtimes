@@ -1,3 +1,9 @@
+# 4.2.12
+* Merge changes from 4.1.1 and 4.1.2.
+
+# 4.1.2
+* API documentation and minor cosmetics.
+
 # 4.1.1
 * Backport to 4.1 spine-runtimes branch.
 * Blend mode support.
