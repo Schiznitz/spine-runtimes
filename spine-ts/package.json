@@ -57,15 +57,15 @@
     "spine-webgl"
   ],
   "devDependencies": {
-    "@types/offscreencanvas": "^2019.6.4",
-    "concurrently": "^7.6.0",
-    "copyfiles": "^2.4.1",
-    "esbuild": "^0.16.4",
-    "live-server": "^1.2.2",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.9.4",
-    "@types/three": "^0.146.0",
-    "three": "^0.146.0",
-    "phaser": "^3.60.0"
+    "@types/offscreencanvas": "latest",
+    "concurrently": "latest",
+    "copyfiles": "latest",
+    "esbuild": "latest",
+    "live-server": "latest",
+    "rimraf": "latest",
+    "typescript": "latest",
+    "@types/three": "latest",
+    "three": "latest",
+    "phaser": "latest"
   }
 }
