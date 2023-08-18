@@ -30,14 +30,14 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@esotericsoftware/spine-core": "4.1.37"
+    "@esotericsoftware/spine-core": "*"
   },
   "peerDependencies": {
-    "@pixi/core": "^7.2.4",
-    "@pixi/display": "^7.2.4",
-    "@pixi/graphics": "^7.2.4",
-    "@pixi/text": "^7.2.4",
-    "@pixi/assets": "^7.2.4",
-    "@pixi/mesh": "^7.2.4"
+    "@pixi/core": "latest",
+    "@pixi/display": "latest",
+    "@pixi/graphics": "latest",
+    "@pixi/text": "latest",
+    "@pixi/assets": "latest",
+    "@pixi/mesh": "latest"
   }
 }
