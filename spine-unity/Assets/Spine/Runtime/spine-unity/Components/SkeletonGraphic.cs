@@ -35,6 +35,8 @@
 #define HAS_CULL_TRANSPARENT_MESH
 #endif
 
+#define SPINE_OPTIONAL_ON_DEMAND_LOADING
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -415,6 +417,9 @@ namespace Spine.Unity {
 			if (freeze) return;
 			if (updateMode != UpdateMode.FullUpdate) return;
 
+			if (updateTiming == UpdateTiming.InLateUpdate)
+				Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+
 			PrepareInstructionsAndRenderers();
 
 			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
@@ -599,6 +604,8 @@ namespace Spine.Unity {
 				SetRectTransformSize(submeshGraphic, size);
 				submeshGraphic.rectTransform.pivot = p;
 			}
+
+			this.referenceSize = size;
 		}
 
 		public static void SetRectTransformSize (Graphic target, Vector2 size) {
@@ -818,14 +825,22 @@ namespace Spine.Unity {
 			else
 				canvasRenderer.SetMesh(null);
 
+			bool assignTexture = false;
 			if (currentInstructions.submeshInstructions.Count > 0) {
 				Material material = currentInstructions.submeshInstructions.Items[0].material;
 				if (material != null && baseTexture != material.mainTexture) {
 					baseTexture = material.mainTexture;
 					if (overrideTexture == null && assignAtCanvasRenderer)
-						canvasRenderer.SetTexture(this.mainTexture);
+						assignTexture = true;
 				}
 			}
+
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+			if (Application.isPlaying)
+				HandleOnDemandLoading();
+#endif
+			if (assignTexture)
+				canvasRenderer.SetTexture(this.mainTexture);
 		}
 
 		protected void UpdateMaterialsMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions) {
@@ -896,7 +911,6 @@ namespace Spine.Unity {
 			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
 			Material[] usedMaterialItems = usedMaterials.Items;
 			Texture[] usedTextureItems = usedTextures.Items;
-			bool assignAtCanvasRenderer = (assignMeshOverrideSingle == null || !disableMeshAssignmentOnOverride);
 			for (int i = 0; i < submeshCount; i++) {
 				SubmeshInstruction submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				meshGenerator.Begin();
@@ -929,12 +943,49 @@ namespace Spine.Unity {
 #endif
 				}
 				canvasRenderer.materialCount = 1;
-				if (assignAtCanvasRenderer)
-					canvasRenderer.SetMaterial(usedMaterialItems[i], usedTextureItems[i]);
 			}
+
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+			if (Application.isPlaying)
+				HandleOnDemandLoading();
+#endif
+			bool assignAtCanvasRenderer = (assignMeshOverrideSingle == null || !disableMeshAssignmentOnOverride);
+			if (assignAtCanvasRenderer) {
+				for (int i = 0; i < submeshCount; i++) {
+					CanvasRenderer canvasRenderer = canvasRenderers[i];
+					canvasRenderer.SetMaterial(usedMaterialItems[i], usedTextureItems[i]);
+				}
+			}
+
 			if (assignMeshOverrideMultiple != null)
 				assignMeshOverrideMultiple(submeshCount, meshesItems, usedMaterialItems, usedTextureItems);
 		}
+
+#if SPINE_OPTIONAL_ON_DEMAND_LOADING
+		void HandleOnDemandLoading () {
+			foreach (AtlasAssetBase atlasAsset in skeletonDataAsset.atlasAssets) {
+				if (atlasAsset.TextureLoadingMode != AtlasAssetBase.LoadingMode.Normal) {
+					atlasAsset.BeginCustomTextureLoading();
+
+					if (!this.allowMultipleCanvasRenderers) {
+						Texture loadedTexture = null;
+						atlasAsset.RequireTextureLoaded(this.mainTexture, ref loadedTexture, null);
+						if (loadedTexture)
+							this.baseTexture = loadedTexture;
+					} else {
+						Texture[] textureItems = usedTextures.Items;
+						for (int i = 0, count = usedTextures.Count; i < count; ++i) {
+							Texture loadedTexture = null;
+							atlasAsset.RequireTextureLoaded(textureItems[i], ref loadedTexture, null);
+							if (loadedTexture)
+								usedTextures.Items[i] = loadedTexture;
+						}
+					}
+					atlasAsset.EndCustomTextureLoading();
+				}
+			}
+		}
+#endif
 
 		protected void EnsureCanvasRendererCount (int targetCount) {
 #if UNITY_EDITOR

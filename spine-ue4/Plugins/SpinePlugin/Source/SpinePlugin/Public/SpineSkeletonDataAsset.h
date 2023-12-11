@@ -111,10 +111,11 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, Instanced, Category = ImportSettings)
-	class UAssetImportData *importData;
+	class UAssetImportData *importData = nullptr;
 
 	virtual void PostInitProperties() override;
-	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const override;
+	virtual void
+	GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const override;
 	virtual void Serialize(FArchive &Ar) override;
 #endif
 

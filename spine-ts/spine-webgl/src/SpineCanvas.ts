@@ -27,7 +27,7 @@
  * SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./";
+import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./index.js";
 
 /** An app running inside a {@link SpineCanvas}. The app life-cycle
  * is as follows:
@@ -87,7 +87,7 @@ export class SpineCanvas {
 			update: () => { },
 			render: () => { },
 			error: () => { },
-			dispose: () => { },
+			dispose: () => { },
 		}
 		if (config.webglConfig) config.webglConfig = { alpha: true };
 
@@ -131,7 +131,7 @@ export class SpineCanvas {
 	}
 
 	/** Disposes the app, so the update() and render() functions are no longer called. Calls the dispose() callback.*/
-	dispose() {
+	dispose () {
 		if (this.config.app.dispose) this.config.app.dispose(this);
 		this.disposed = true;
 	}
