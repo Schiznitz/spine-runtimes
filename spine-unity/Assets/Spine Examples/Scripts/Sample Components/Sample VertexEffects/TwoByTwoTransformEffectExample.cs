@@ -31,20 +31,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Spine.Unity.Examples {
+namespace Spine.Unity.Examples
+{
 
 	// This is a sample component for C# vertex effects for Spine rendering components.
 	// Using shaders and materials to control vertex properties is still more performant
 	// than using this API, but in cases where your vertex effect logic cannot be
 	// expressed as shader code, these vertex effects can be useful.
-	public class TwoByTwoTransformEffectExample : MonoBehaviour {
+	public class TwoByTwoTransformEffectExample : MonoBehaviour
+	{
 
 		public Vector2 xAxis = new Vector2(1, 0);
 		public Vector2 yAxis = new Vector2(0, 1);
 
 		SkeletonRenderer skeletonRenderer;
 
-		void OnEnable () {
+		void OnEnable()
+		{
 			skeletonRenderer = GetComponent<SkeletonRenderer>();
 			if (skeletonRenderer == null) return;
 
@@ -55,7 +58,8 @@ namespace Spine.Unity.Examples {
 			Debug.Log("2x2 Transform Effect Enabled.");
 		}
 
-		void ProcessVertices (MeshGeneratorBuffers buffers) {
+		void ProcessVertices(MeshGeneratorBuffers buffers)
+		{
 			if (!this.enabled)
 				return;
 
@@ -64,7 +68,8 @@ namespace Spine.Unity.Examples {
 			// Modify vertex positions by accessing Vector3[] vertexBuffer
 			Vector3[] vertices = buffers.vertexBuffer;
 			Vector3 transformedPos = default(Vector3);
-			for (int i = 0; i < vertexCount; i++) {
+			for (int i = 0; i < vertexCount; i++)
+			{
 				Vector3 originalPos = vertices[i];
 				transformedPos.x = (xAxis.x * originalPos.x) + (yAxis.x * originalPos.y);
 				transformedPos.y = (xAxis.y * originalPos.x) + (yAxis.y * originalPos.y);
@@ -73,7 +78,8 @@ namespace Spine.Unity.Examples {
 
 		}
 
-		void OnDisable () {
+		void OnDisable()
+		{
 			if (skeletonRenderer == null) return;
 			skeletonRenderer.OnPostProcessVertices -= ProcessVertices;
 			Debug.Log("2x2 Transform Effect Disabled.");
@@ -98,7 +104,11 @@ public class TwoByTwoTransformEffectExampleEditor : UnityEditor.Editor {
 		Color originalColor = UnityEditor.Handles.color;
 		UnityEditor.Handles.color = color;
 		UnityEditor.Handles.DrawLine(transform.position, transform.TransformPoint(v));
-		var fmh_101_103_638460676646512547 = Quaternion.identity; v = transform.InverseTransformPoint(UnityEditor.Handles.FreeMoveHandle(transform.TransformPoint(v), 0.3f, Vector3.zero, UnityEditor.Handles.CubeHandleCap));
+#if UNITY_2022_1_OR_NEWER
+		v = transform.InverseTransformPoint(UnityEditor.Handles.FreeMoveHandle(transform.TransformPoint(v), 0.3f, Vector3.zero, UnityEditor.Handles.CubeHandleCap));
+#else
+		v = transform.InverseTransformPoint(UnityEditor.Handles.FreeMoveHandle(transform.TransformPoint(v), Quaternion.identity, 0.3f, Vector3.zero, UnityEditor.Handles.CubeHandleCap));
+#endif
 		UnityEditor.Handles.color = originalColor;
 	}
 }
