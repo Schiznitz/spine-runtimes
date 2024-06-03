@@ -39,6 +39,8 @@
 // Comment out this line to revert to previous behaviour.
 // You may only need this option disabled when utilizing a custom shader which
 // uses vertex color alpha for purposes other than transparency.
+//
+// Important Note: When disabling this define, also disable the one in SkeletonRenderInstruction.cs
 #define SLOT_ALPHA_DISABLES_ATTACHMENT
 
 using System;
@@ -155,6 +157,11 @@ namespace Spine.Unity {
 				};
 			}
 		}
+
+		/// <summary>Returns the <see cref="SkeletonClipping"/> used by this mesh generator for use with e.g.
+		/// <see cref="Skeleton.GetBounds(out float, out float, out float, out float, ref float[], SkeletonClipping)"/>
+		/// </summary>
+		public SkeletonClipping SkeletonClipping { get { return clipper; } }
 
 		public MeshGenerator () {
 			submeshes.TrimExcess();

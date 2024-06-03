@@ -54,29 +54,6 @@ rm -f "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"*
 mkdir -p "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
 cp -f ../cloud-pot/export/* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/cloud-pot/"
 
-echo "spine-cocos2d-objc"
-rm "$ROOT/spine-cocos2d-objc/Resources/"*
-
-cp -f ../coin/export/coin-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../coin/export/coin.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../goblins/export/goblins.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../goblins/export/goblins.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../raptor/export/raptor.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../raptor/export/raptor.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../spineboy/export/spineboy.png "$ROOT/spine-cocos2d-objc/Resources/"
-
-cp -f ../tank/export/tank-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../tank/export/tank.atlas "$ROOT/spine-cocos2d-objc/Resources/"
-cp -f ../tank/export/tank.png "$ROOT/spine-cocos2d-objc/Resources/"
-
 echo "spine-cocos2dx"
 rm -rf "$ROOT/spine-cocos2dx/example/Resources/common/"*
 
@@ -248,8 +225,8 @@ cp -f ../celestial-circus/export/celestial-circus.png "$ROOT/spine-godot/example
 echo "spine-sdl"
 rm -f "$ROOT/spine-sdl/data/"*
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-sdl/data/"
-cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-sdl/data/"
-cp -f ../spineboy/export/spineboy.png "$ROOT/spine-sdl/data/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-sdl/data/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-sdl/data/"
 
 echo "spine-sfml-c"
 rm "$ROOT/spine-sfml/c/data/"*
@@ -519,6 +496,10 @@ cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-pixi/example/a
 cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ts/spine-pixi/example/assets/"
+
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-pixi/example/typescript/assets/"
+cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-pixi/example/typescript/assets/"
+cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-pixi/example/typescript/assets/"
 
 cp -f ../coin/export/coin-pro.skel "$ROOT/spine-ts/spine-pixi/example/assets/"
 cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-ts/spine-pixi/example/assets/"

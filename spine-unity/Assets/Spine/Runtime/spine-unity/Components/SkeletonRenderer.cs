@@ -239,6 +239,7 @@ namespace Spine.Unity {
 					Initialize(false);
 					if (meshRenderer)
 						meshRenderer.enabled = false;
+					updateMode = UpdateMode.FullUpdate;
 				}
 			}
 			remove {
@@ -270,6 +271,11 @@ namespace Spine.Unity {
 		[System.NonSerialized] readonly SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
 		readonly MeshGenerator meshGenerator = new MeshGenerator();
 		[System.NonSerialized] readonly MeshRendererBuffers rendererBuffers = new MeshRendererBuffers();
+
+		/// <summary>Returns the <see cref="SkeletonClipping"/> used by this renderer for use with e.g.
+		/// <see cref="Skeleton.GetBounds(out float, out float, out float, out float, ref float[], SkeletonClipping)"/>
+		/// </summary>
+		public SkeletonClipping SkeletonClipping { get { return meshGenerator.SkeletonClipping; } }
 		#endregion
 
 		#region Cached component references
@@ -400,7 +406,8 @@ namespace Spine.Unity {
 
 		public virtual void Awake () {
 			Initialize(false);
-			updateMode = updateWhenInvisible;
+			if (generateMeshOverride == null || !disableRenderingOnOverride)
+				updateMode = updateWhenInvisible;
 		}
 
 #if UNITY_EDITOR && CONFIGURABLE_ENTER_PLAY_MODE
@@ -515,12 +522,14 @@ namespace Spine.Unity {
 				if (physicsPositionInheritanceFactor != Vector2.zero) {
 					Vector2 position = GetPhysicsTransformPosition();
 					Vector2 positionDelta = position - lastPosition;
+
+					positionDelta = transform.InverseTransformVector(positionDelta);
 					if (physicsMovementRelativeTo != null) {
-						positionDelta.x *= physicsMovementRelativeTo.lossyScale.x;
-						positionDelta.y *= physicsMovementRelativeTo.lossyScale.y;
+						positionDelta = physicsMovementRelativeTo.TransformVector(positionDelta);
 					}
-					positionDelta.x *= physicsPositionInheritanceFactor.x / transform.lossyScale.x;
-					positionDelta.y *= physicsPositionInheritanceFactor.y / transform.lossyScale.y;
+					positionDelta.x *= physicsPositionInheritanceFactor.x;
+					positionDelta.y *= physicsPositionInheritanceFactor.y;
+
 					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
 					lastPosition = position;
 				}

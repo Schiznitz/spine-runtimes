@@ -400,12 +400,13 @@ namespace Spine.Unity {
 				if (physicsPositionInheritanceFactor != Vector2.zero) {
 					Vector2 position = GetPhysicsTransformPosition();
 					Vector2 positionDelta = (position - lastPosition) / meshScale;
+
+					positionDelta = transform.InverseTransformVector(positionDelta);
 					if (physicsMovementRelativeTo != null) {
-						positionDelta.x *= physicsMovementRelativeTo.lossyScale.x;
-						positionDelta.y *= physicsMovementRelativeTo.lossyScale.y;
+						positionDelta = physicsMovementRelativeTo.TransformVector(positionDelta);
 					}
-					positionDelta.x *= physicsPositionInheritanceFactor.x / transform.lossyScale.x;
-					positionDelta.y *= physicsPositionInheritanceFactor.y / transform.lossyScale.y;
+					positionDelta.x *= physicsPositionInheritanceFactor.x;
+					positionDelta.y *= physicsPositionInheritanceFactor.y;
 
 					skeleton.PhysicsTranslate(positionDelta.x, positionDelta.y);
 					lastPosition = position;
@@ -644,6 +645,11 @@ namespace Spine.Unity {
 		readonly ExposedList<Mesh> meshes = new ExposedList<Mesh>();
 		readonly ExposedList<Material> usedMaterials = new ExposedList<Material>();
 		readonly ExposedList<Texture> usedTextures = new ExposedList<Texture>();
+
+		/// <summary>Returns the <see cref="SkeletonClipping"/> used by this renderer for use with e.g.
+		/// <see cref="Skeleton.GetBounds(out float, out float, out float, out float, ref float[], SkeletonClipping)"/>
+		/// </summary>
+		public SkeletonClipping SkeletonClipping { get { return meshGenerator.SkeletonClipping; } }
 
 		public ExposedList<Mesh> MeshesMultipleCanvasRenderers { get { return meshes; } }
 		public ExposedList<Material> MaterialsMultipleCanvasRenderers { get { return usedMaterials; } }

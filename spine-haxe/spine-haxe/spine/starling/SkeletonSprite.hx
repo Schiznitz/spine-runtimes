@@ -29,6 +29,7 @@
 
 package spine.starling;
 
+import spine.animation.Animation;
 import starling.animation.IAnimatable;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
@@ -40,6 +41,8 @@ import spine.SkeletonData;
 import spine.Slot;
 import spine.animation.AnimationState;
 import spine.animation.AnimationStateData;
+import spine.animation.MixBlend;
+import spine.animation.MixDirection;
 import spine.attachments.Attachment;
 import spine.attachments.ClippingAttachment;
 import spine.attachments.MeshAttachment;
@@ -66,11 +69,14 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 	private var _smoothing:String = "bilinear";
 
-	private static var clipper:SkeletonClipping = new SkeletonClipping();
+	public static var clipper(default, never):SkeletonClipping = new SkeletonClipping();
 	private static var QUAD_INDICES:Array<Int> = [0, 1, 2, 2, 3, 0];
 
 	private var tempLight:spine.Color = new spine.Color(0, 0, 0);
 	private var tempDark:spine.Color = new spine.Color(0, 0, 0);
+
+	public var beforeUpdateWorldTransforms: SkeletonSprite -> Void = function(_) {};
+	public var afterUpdateWorldTransforms: SkeletonSprite -> Void = function(_) {};
 
 	public function new(skeletonData:SkeletonData, animationStateData:AnimationStateData = null) {
 		super();
@@ -314,6 +320,33 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 		return resultRect;
 	}
 
+	public function getAnimationBounds(animation:Animation, clip:Bool = true): Rectangle {
+		var clipper = clip ? SkeletonSprite.clipper : null;
+		_skeleton.setToSetupPose();
+
+		var steps = 100, time = 0.;
+		var stepTime = animation.duration != 0 ? animation.duration / steps : 0;
+		var minX = 100000000., maxX = -100000000., minY = 100000000., maxY = -100000000.;
+
+		var bound:lime.math.Rectangle;
+		for (i in 0...steps) {
+			animation.apply(_skeleton, time , time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
+			_skeleton.updateWorldTransform(Physics.update);
+			bound = _skeleton.getBounds(clipper);
+
+			if (!Math.isNaN(bound.x) && !Math.isNaN(bound.y) && !Math.isNaN(bound.width) && !Math.isNaN(bound.height)) {
+				minX = Math.min(bound.x, minX);
+				minY = Math.min(bound.y, minY);
+				maxX = Math.max(bound.right, maxX);
+				maxY = Math.max(bound.bottom, maxY);
+			} else
+				trace("ERROR");
+
+			time += stepTime;
+		}
+		return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+	}
+
 	public var skeleton(get, never):Skeleton;
 
 	private function get_skeleton():Skeleton {
@@ -340,8 +373,47 @@ class SkeletonSprite extends DisplayObject implements IAnimatable {
 	public function advanceTime(time:Float):Void {
 		_state.update(time);
 		_state.apply(skeleton);
+		this.beforeUpdateWorldTransforms(this);
 		skeleton.update(time);
 		skeleton.updateWorldTransform(Physics.update);
+		this.afterUpdateWorldTransforms(this);
 		this.setRequiresRedraw();
+	}
+
+	public function skeletonToHaxeWorldCoordinates(point:Array<Float>):Void {
+		var transform = this.transformationMatrix;
+		var a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+			var x = point[0];
+			var y = point[1];
+			point[0] = x * a + y * c + tx;
+			point[1] = x * b + y * d + ty;
+	}
+
+	public function haxeWorldCoordinatesToSkeleton(point:Array<Float>):Void {
+		var transform = this.transformationMatrix.clone().invert();
+		var a = transform.a,
+			b = transform.b,
+			c = transform.c,
+			d = transform.d,
+			tx = transform.tx,
+			ty = transform.ty;
+		var x = point[0];
+		var y = point[1];
+		point[0] = x * a + y * c + tx;
+		point[1] = x * b + y * d + ty;
+	}
+
+	public function haxeWorldCoordinatesToBone(point:Array<Float>, bone: Bone):Void {
+		this.haxeWorldCoordinatesToSkeleton(point);
+		if (bone.parent != null) {
+			bone.parent.worldToLocal(point);
+		} else {
+			bone.worldToLocal(point);
+		}
 	}
 }
